@@ -8,6 +8,7 @@ import { migrate as migratePglite } from 'drizzle-orm/pglite/migrator';
 import { PHASE_PRODUCTION_BUILD } from 'next/dist/shared/lib/constants';
 import { Client } from 'pg';
 
+import { logger } from '@/libs/Logger';
 import * as schema from '@/models/Schema';
 
 import { Env } from './Env';
@@ -16,6 +17,8 @@ let client;
 let drizzle;
 
 if (process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD && Env.DATABASE_URL) {
+  logger.info('Connecting to PostgreSQL database');
+
   client = new Client({
     connectionString: Env.DATABASE_URL,
   });
@@ -29,6 +32,7 @@ if (process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD && Env.DATABASE_URL) {
   const global = globalThis as unknown as { client: PGlite; drizzle: PgliteDatabase<typeof schema> };
 
   if (!global.client) {
+    logger.info('Connecting to PGLite database');
     global.client = new PGlite();
     await global.client.waitReady;
 
