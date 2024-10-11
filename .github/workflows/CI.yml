@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
 jobs:
   build:
     strategy:
@@ -15,10 +21,6 @@ jobs:
 
     name: Build with ${{ matrix.node-version }}
     runs-on: ubuntu-latest
-
-    env:
-      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
 
     steps:
       - uses: actions/checkout@v3
@@ -37,10 +39,6 @@ jobs:
 
     name: Run all tests
     runs-on: ubuntu-latest
-
-    env:
-      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
 
     steps:
       - uses: actions/checkout@v3
@@ -76,11 +74,12 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Install Playwright (used for Storybook and E2E tests)
-        run: npx playwright install --with-deps
+      # - name: Install Playwright (used for Storybook and E2E tests)
+      #   run: npx playwright install --with-deps
 
-      - name: Run storybook tests
-        run: npm run test-storybook:ci
+      # TODO: Uncomment this when we have storybook tests
+      # - name: Run storybook tests
+      #   run: npm run test-storybook:ci
 
       # TODO: Uncomment this when we have E2E tests
       # - name: Run E2E tests
@@ -122,3 +121,22 @@ jobs:
   #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   #         CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
   #         CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+
+  # FIXME: Uncomment this when we have a production deployment
+  # deploy-production:
+  #   name: GitHub Actions Vercel Production Deployment
+  #   runs-on: ubuntu-latest
+
+  #   needs: [build, test]
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Install Vercel CLI
+  #       run: npm install --global vercel@canary
+  #     - name: Pull Vercel Environment Information
+  #       run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+  #     - name: Build Project Artifacts
+  #       run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+  #     - name: Deploy Project Artifacts to Vercel
+  #       run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
