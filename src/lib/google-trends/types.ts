@@ -1,0 +1,1 @@
+export type WidgetId = 'TIMESERIES' | 'GEO_MAP' | 'RELATED_TOPICS' | 'RELATED_QUERIES';
